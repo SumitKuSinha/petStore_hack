@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Product Management</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+    <div class="navbar">
+        <a th:href="@{/}">PetShop Stop</a>
+        
+        <div class="dropdown">
+            <button class="dropbtn">Pets &#x25BC;</button>
+            <div class="dropdown-content">
+                <a th:href="@{/pets/species/Dog}">Dogs</a>
+                <a th:href="@{/pets/species/Cat}">Cats</a>
+            </div>
+        </div>
+        
+        <div class="dropdown">
+            <button class="dropbtn">Products &#x25BC;</button>
+            <div class="dropdown-content">
+                <a th:href="@{/products/type/Dog}">Dog Products</a>
+                <a th:href="@{/products/type/Cat}">Cat Products</a>
+                <a th:href="@{/products/type/Bird}">Bird Products</a>
+            </div>
+        </div>
+        
+        <form th:action="@{/search}" method="GET" style="display: inline-block;">
+            <input type="text" name="keyword" placeholder="Search..." />
+            <button type="submit" class="btn btn-primary" style="padding: 2px 6px;">Go</button>
+        </form>
+        
+        <div sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/pets}">Pet Management</a>
+            <a th:href="@{/admin/products}">Product Management</a>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/register}">Register</a>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" method="POST" style="display: inline;">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Product Inventory Dashboard</h1>
+    
+        <div th:if="${!lowStockProducts.isEmpty()}" class="alert-danger">
+            <strong>Warning!</strong> The following items are low on stock (less than 10):
+            <ul>
+                <li th:each="item : ${lowStockProducts}" 
+                    th:text="${item.name + ' (Stock: ' + item.stockQuantity + ')'}">
+                </li>
+            </ul>
+        </div>
+        
+        <div class="inventory-report">
+            <h3>Current Inventory Report</h3>
+            <p>
+                Total Items in Stock: <strong th:text="${totalStock != null ? totalStock : '0'}">0</strong>
+            </p>
+            <p>
+                Total Inventory Value: <strong th:text="${totalValue != null ? '$' + #numbers.formatDecimal(totalValue, 1, 2) : '$0.00'}">$0.00</strong>
+            </p>
+        </div>
+        
+        <a th:href="@{/admin/products/new}" class="btn btn-primary">Add New Product</a>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Image</th> <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="product : ${products}">

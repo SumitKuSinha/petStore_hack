@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Form</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <a th:href="@{/}">PetShop Stop</a>
+    
+    <div class="dropdown">
+        <button class="dropbtn">Pets &#x25BC;</button>
+        <div class="dropdown-content">
+            <a th:href="@{/pets/species/Dog}">Dogs</a>
+            <a th:href="@{/pets/species/Cat}">Cats</a>
+        </div>
+    </div>
+    
+    <div class="dropdown">
+        <button class="dropbtn">Products &#x25BC;</button>
+        <div class="dropdown-content">
+            <a th:href="@{/products/type/Dog}">Dog Products</a>
+            <a th:href="@{/products/type/Cat}">Cat Products</a>
+            <a th:href="@{/products/type/Bird}">Bird Products</a>
+        </div>
+    </div>
+    
+    <form th:action="@{/search}" method="GET" style="display: inline-block;">
+        <input type="text" name="keyword" placeholder="Search..." />
+        <button type="submit" class="btn btn-primary" style="padding: 2px 6px;">Go</button>
+    </form>
+    
+    <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/pets}">Pet Management</a>
+        <a th:href="@{/admin/products}">Product Management</a>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Register</a>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="POST" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+
+    <div class="container">
+        <h1 th:if="${pet.id == null}">Create New Pet</h1>
+        <h1 th:unless="${pet.id == null}">Edit Pet</h1>
+
+        <form th:action="@{/admin/pets/save}" th:object="${pet}" method="POST">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label>Pet Name:</label>
+                <input type="text" th:field="*{name}" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Species:</label>
+                <input type="text" th:field="*{species}" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Breed:</label>
+                <input type="text" th:field="*{breed}" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Age:</label>
+                <input type="number" th:field="*{age}" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Price:</label>
+                <input type="number" step="0.01" th:field="*{price}" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Pet</button>
+
+        </form>
+    </div>
+</body>
+</html>

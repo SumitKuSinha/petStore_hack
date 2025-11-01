@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to the PetShop!</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <a th:href="@{/}">PetShop Stop</a>
+    
+    <div class="dropdown">
+        <button class="dropbtn">Pets &#x25BC;</button>
+        <div class="dropdown-content">
+            <a th:href="@{/pets/species/Dog}">Dogs</a>
+            <a th:href="@{/pets/species/Cat}">Cats</a>
+        </div>
+    </div>
+    
+    <div class="dropdown">
+        <button class="dropbtn">Products &#x25BC;</button>
+        <div class="dropdown-content">
+            <a th:href="@{/products/type/Dog}">Dog Products</a>
+            <a th:href="@{/products/type/Cat}">Cat Products</a>
+            <a th:href="@{/products/type/Bird}">Bird Products</a>
+        </div>
+    </div>
+    
+    <form th:action="@{/search}" method="GET" style="display: inline-block;">
+        <input type="text" name="keyword" placeholder="Search..." />
+        <button type="submit" class="btn btn-primary" style="padding: 2px 6px;">Go</button>
+    </form>
+    
+    <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/pets}">Pet Management</a>
+        <a th:href="@{/admin/products}">Product Management</a>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Register</a>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="POST" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+
+    <div class="container">
+        <h1>Welcome to our Store!</h1>
+
+        <h2>Available Pets (Module 1)</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Breed</th>
+                    <th>Price</th>
+                    <th>Buy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="pet : ${pets}">
+                    <td th:text="${pet.name}"></td>
+                    <td th:text="${pet.breed}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(pet.price, 1, 2)}"></td>
+                    <td>
+                        <a href="#" class="btn btn-primary btn-buy" 
+                           th:data-name="${pet.name}" 
+                           th:data-price="${pet.price}">Buy Now</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+<h2 style="margin-top: 30px;">Pet Products</h2>
+        <table class="table">
+             <thead>
+                <tr>
+                    <th>Image</th> <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock Available</th>
+                    <th>Buy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="prod : ${products}">
+                    <td>
+                        <img th:if="${prod.imageUrl}" th:src="@{${prod.imageUrl}}" alt="Product Image" style="width: 100px; height: auto;" />
+                        <span th:unless="${prod.imageUrl}">No Image</span>
+                    </td>
+                    <td th:text="${prod.name}"></td>
+                    <td th:text="${prod.category}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(prod.price, 1, 2)}"></td>
+                    <td>
+                        <span th:if="${prod.stockQuantity < 10}" style="color: red; font-weight: bold;">
+                            Only <span th:text="${prod.stockQuantity}"></span> left!
+                        </span>
+                        <span th:if="${prod.stockQuantity >= 10}">
+                            <span th:text="${prod.stockQuantity}"></span> in stock
+                        </span>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-primary btn-buy" 
+                           th:data-name="${prod.name}" 
+                           th:data-price="${prod.price}">Buy Now</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="modal-close">&times;</span>
+
+            <h1>Checkout</h1>
+            <h3>You are buying: <span id="modal-item-name">Item Name</span></h3>
+            <h4>Price: <span id="modal-item-price">$0.00</span></h4>
+
+            <form th:action="@{/pay}" method="POST">
+                <div class="form-group">
+                    <label>Credit Card Number (Fake)</label>
+                    <input type="text" class="form-control" placeholder="4242 4242 4242 4242">
+                </div>
+                <div class="form-group">
+                    <label>CVC (Fake)</label>
+                    <input type="text" class="form-control" placeholder="123">
+                </div>
+                <button type="submit" class="btn btn-primary">Pay Now</button>
+            </form>
+
+        </div>
+    </div>
+
+    <script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

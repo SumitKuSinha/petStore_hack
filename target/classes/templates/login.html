@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div class="navbar">
+    <a th:href="@{/}">PetShop Stop</a>
+    
+    <div class="dropdown">
+        <button class="dropbtn">Pets &#x25BC;</button>
+        <div class="dropdown-content">
+            <a th:href="@{/pets/species/Dog}">Dogs</a>
+            <a th:href="@{/pets/species/Cat}">Cats</a>
+        </div>
+    </div>
+    
+    <div class="dropdown">
+        <button class="dropbtn">Products &#x25BC;</button>
+        <div class="dropdown-content">
+            <a th:href="@{/products/type/Dog}">Dog Products</a>
+            <a th:href="@{/products/type/Cat}">Cat Products</a>
+            <a th:href="@{/products/type/Bird}">Bird Products</a>
+        </div>
+    </div>
+    
+    <form th:action="@{/search}" method="GET" style="display: inline-block;">
+        <input type="text" name="keyword" placeholder="Search..." />
+        <button type="submit" class="btn btn-primary" style="padding: 2px 6px;">Go</button>
+    </form>
+    
+    <div sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/pets}">Pet Management</a>
+        <a th:href="@{/admin/products}">Product Management</a>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/register}">Register</a>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="POST" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+    <div class="container" style="max-width: 500px;">
+        
+        <h1>Login</h1> 
+
+        <div th:if="${param.error}" class="alert-danger">
+            Invalid username or password.
+        </div>
+
+        <form th:action="@{/login}" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <p>Don't have an account? 
+                <a th:href="@{/register}">Register here</a>
+            </p>
+        </div>
+        
+    </div>
+</body>
+</html>
