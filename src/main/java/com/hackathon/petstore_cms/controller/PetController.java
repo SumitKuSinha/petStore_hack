@@ -8,22 +8,33 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+// --- NEW IMPORTS for Image Handling ---
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+// ----------------------------------------
+
 import com.hackathon.petstore_cms.entity.Pet;
 import com.hackathon.petstore_cms.repository.PetRepository;
 
 @Controller
 public class PetController {
 
+    // IMPORTANT: External directory to avoid Maven rebuild issues
+    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploaded_images"; 
+
     @Autowired
     private PetRepository petRepository;
 
     // 1. READ (List all pets)
-    // We will map this to "/admin/pets" to keep it secure
     @GetMapping("/admin/pets")
     public String listPets(Model model) {
         model.addAttribute("pets", petRepository.findAll());
-        // This will look for a file named "admin-pets.html"
-        return "admin-pets"; 
+        return "admin-pets";  // We will update admin-pets.html next
     }
 
     // 2. CREATE (Show the "add new pet" form)
@@ -31,13 +42,39 @@ public class PetController {
     public String showCreatePetForm(Model model) {
         Pet pet = new Pet();
         model.addAttribute("pet", pet);
-        // This will look for a file named "pet-form.html"
-        return "pet-form";
+        return "pet-form"; // We will update pet-form.html next
     }
 
-    // 3. CREATE (Handle the form submission)
+    // 3. CREATE/UPDATE (Handle the form submission with file)
     @PostMapping("/admin/pets/save")
-    public String savePet(@ModelAttribute("pet") Pet pet) {
+    public String savePet(@ModelAttribute("pet") Pet pet,
+                          @RequestParam("petImage") MultipartFile file) throws IOException { // <-- Added @RequestParam
+        
+        // --- IMAGE UPLOAD LOGIC ---
+        if (!file.isEmpty()) {
+            String fileName = file.getOriginalFilename();
+            Path path = Paths.get(UPLOAD_DIRECTORY, fileName);
+            
+            // Ensure the external folder exists
+            if (!Files.exists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+            
+            // Save the file
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            
+            // Set the web-accessible path (mapped via WebConfig to /uploaded_images)
+            pet.setImageUrl("/images/" + fileName); 
+            
+        } else if (pet.getId() != null) {
+            // Edit scenario: If no new file is uploaded, keep the old image URL
+            Pet existingPet = petRepository.findById(pet.getId()).orElse(null);
+            if (existingPet != null) {
+                pet.setImageUrl(existingPet.getImageUrl());
+            }
+        }
+        // --- END IMAGE LOGIC ---
+
         petRepository.save(pet);
         return "redirect:/admin/pets"; // Go back to the pet list
     }
@@ -45,9 +82,11 @@ public class PetController {
     // 4. UPDATE (Show the "edit pet" form, pre-filled)
     @GetMapping("/admin/pets/edit/{id}")
     public String showEditPetForm(@PathVariable Long id, Model model) {
-        Pet pet = petRepository.findById(id).get();
+        // Use orElseThrow() for robust error handling if ID is bad
+        Pet pet = petRepository.findById(id).orElseThrow(() -> 
+            new RuntimeException("Pet with ID " + id + " not found.")
+        );
         model.addAttribute("pet", pet);
-        // Re-use the same form: "pet-form.html"
         return "pet-form";
     }
 

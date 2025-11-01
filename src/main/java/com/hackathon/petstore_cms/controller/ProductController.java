@@ -26,7 +26,7 @@ import java.nio.file.StandardCopyOption;
 public class ProductController {
 
     // Define the folder where images will be saved
-    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/images";
+	public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploaded_images";
 
     @Autowired
     private ProductRepository productRepository;

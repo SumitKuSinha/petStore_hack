@@ -35,4 +35,12 @@ public class AuthController {
         userService.saveUser(userDto);
         return "redirect:/login?success"; // Go to login with a success msg
     }
+
+    // --- NEW METHOD FOR LOGOUT FIX ---
+    @GetMapping("/logout-success")
+    public String logoutSuccessPage() {
+        // This tells Spring to load the 'logout-reload.html' template
+        // This page contains the JavaScript that forces a clean redirect to "/"
+        return "logout-reload"; 
+    }
 }

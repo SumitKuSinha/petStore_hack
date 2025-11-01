@@ -31,18 +31,21 @@ public class StorefrontController {
         return "index";
     }
 
-    // 2. Checkout Flow
+    // 2. Checkout Flow - CRITICAL FIX HERE (Removed Hyphen)
     @PostMapping("/pay")
     public String processPayment() {
-        return "redirect:/thank-you";
+        // ★ Redirect to the new, consistent URL
+        return "redirect:/thankyou"; 
     }
     
-    @GetMapping("/thank-you")
+    // 3. Thank You Page - CRITICAL FIX HERE (Removed Hyphen)
+    @GetMapping("/thankyou")
     public String showThankYouPage() {
-        return "thank-you";
+        // ★ Returns the template named "thankyou.html"
+        return "thankyou"; 
     }
 
-    // 3. Category Page for Pets
+    // 4. Category Page for Pets
     @GetMapping("/pets/species/{species}")
     public String showPetsBySpecies(@PathVariable("species") String species, Model model) {
         model.addAttribute("pets", petRepository.findBySpecies(species));
@@ -50,7 +53,7 @@ public class StorefrontController {
         return "category-view";
     }
 
-    // 4. THIS IS YOUR NEW, CORRECTED METHOD
+    // 5. Category Page for Products
     @GetMapping("/products/type/{type}")
     public String showProductsByType(@PathVariable("type") String type, Model model) {
         model.addAttribute("products", productRepository.findByType(type));
@@ -58,7 +61,7 @@ public class StorefrontController {
         return "category-view";
     }
 
-    // 5. Search Bar
+    // 6. Search Bar
     @GetMapping("/search")
     public String search(@RequestParam("keyword") String keyword, Model model) {
         List<Pet> petResults = petRepository.search(keyword);

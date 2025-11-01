@@ -12,6 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import com.hackathon.petstore_cms.service.UserService;
 
+// The following imports are no longer needed for the final fix:
+// import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+// import org.springframework.http.HttpStatus;
+
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -21,15 +26,11 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // This bean tells Spring to use our UserService
     @Bean
     public DaoAuthenticationProvider authenticationProvider(UserService userService, PasswordEncoder passwordEncoder) {
-        // --- THIS IS THE FIX ---
-        // We now get UserService AND PasswordEncoder as parameters
-        
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userService); 
-        authProvider.setPasswordEncoder(passwordEncoder); // <-- Now we use the parameter
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -44,7 +45,8 @@ public class SecurityConfig {
                     "/login",
                     "/js/**",
                     "/style.css",
-                    "/images/**"
+                    "/images/**",
+                    "/logout-success" // ★ IMPORTANT: The success page must be public
                 ).permitAll()
 
                 // 2. These pages are ADMIN-ONLY
@@ -54,16 +56,21 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login") // We are back to using /login
+                .loginPage("/login") 
                 .loginProcessingUrl("/login")
                 .successHandler(myAuthenticationSuccessHandler())
                 .permitAll()
             )
+            // --- CRITICAL LOGOUT FIX: Redirects to a client-side reload page ---
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .permitAll()
+                .logoutUrl("/logout") 
+                // ★ CHANGE: Redirects to our auto-reloading page
+                .logoutSuccessUrl("/logout-success") 
+                .permitAll() 
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
             );
+            // --------------------------------------------------------------------
 
         return http.build();
     }
@@ -73,7 +80,7 @@ public class SecurityConfig {
     public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
         return (request, response, authentication) -> {
             if (authentication.getAuthorities().stream()
-                      .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 response.sendRedirect("/admin/pets");
             } else {
                 response.sendRedirect("/");
