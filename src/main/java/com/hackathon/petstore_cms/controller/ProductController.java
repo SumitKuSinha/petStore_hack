@@ -51,12 +51,12 @@ public class ProductController {
         return "product-form";
     }
 
-    // === THIS METHOD IS NOW UPDATED ===
+   
     @PostMapping("/admin/products/save")
     public String saveProduct(@ModelAttribute("product") Product product, 
                               @RequestParam("productImage") MultipartFile file) throws IOException {
         
-        // --- This is the new logic to handle the image file ---
+       
         if (!file.isEmpty()) {
             String fileName = file.getOriginalFilename();
             Path path = Paths.get(UPLOAD_DIRECTORY, fileName);
@@ -72,8 +72,8 @@ public class ProductController {
             product.setImageUrl("/images/" + fileName); 
             
         } else if (product.getId() != null) {
-            // This is an edit, but no new file was uploaded.
-            // We must get the old image URL from the DB to prevent losing it.
+            
+          
             Product oldProduct = productRepository.findById(product.getId()).get();
             product.setImageUrl(oldProduct.getImageUrl());
         }

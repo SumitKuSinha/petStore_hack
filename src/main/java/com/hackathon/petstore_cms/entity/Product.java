@@ -25,7 +25,7 @@ public class Product {
     
     private String type;
     
-    // === NEW FIELD ===
+   
     private String imageUrl;
 
     // --- Getters and Setters ---
@@ -86,7 +86,7 @@ public class Product {
         this.type = type;
     }
 
-    // === NEW GETTER/SETTER ===
+  
     public String getImageUrl() {
         return imageUrl;
     }

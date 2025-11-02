@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-// --- NEW IMPORTS for Image Handling ---
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-// ----------------------------------------
+
 
 import com.hackathon.petstore_cms.entity.Pet;
 import com.hackathon.petstore_cms.repository.PetRepository;
@@ -24,7 +24,7 @@ import com.hackathon.petstore_cms.repository.PetRepository;
 @Controller
 public class PetController {
 
-    // IMPORTANT: External directory to avoid Maven rebuild issues
+
     public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploaded_images"; 
 
     @Autowired
@@ -34,7 +34,7 @@ public class PetController {
     @GetMapping("/admin/pets")
     public String listPets(Model model) {
         model.addAttribute("pets", petRepository.findAll());
-        return "admin-pets";  // We will update admin-pets.html next
+        return "admin-pets";  
     }
 
     // 2. CREATE (Show the "add new pet" form)
@@ -42,7 +42,7 @@ public class PetController {
     public String showCreatePetForm(Model model) {
         Pet pet = new Pet();
         model.addAttribute("pet", pet);
-        return "pet-form"; // We will update pet-form.html next
+        return "pet-form"; 
     }
 
     // 3. CREATE/UPDATE (Handle the form submission with file)

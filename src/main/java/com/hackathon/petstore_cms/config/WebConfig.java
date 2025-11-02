@@ -13,7 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
         String absolutePath = System.getProperty("user.dir") + "/uploaded_images/";
         
         // Map the URL path /images/** to the external folder.
-        // This is necessary because the images are no longer in /static.
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:" + absolutePath); 
     }

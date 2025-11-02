@@ -1,6 +1,6 @@
 package com.hackathon.petstore_cms.entity;
 
-import jakarta.persistence.Column; // Required import for @Column
+import jakarta.persistence.Column; 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +21,7 @@ public class Pet {
     private int age;
     private double price;
 
-    // --- NEW FIELD ---
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -63,7 +63,7 @@ public class Pet {
         this.price = price;
     }
     
-    // --- NEW GETTER AND SETTER ---
+
     public String getImageUrl() {
         return imageUrl;
     }

@@ -5,7 +5,7 @@ import com.hackathon.petstore_cms.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // This is a custom method Spring Security will use
+    
     User findByUsername(String username);
 
 }

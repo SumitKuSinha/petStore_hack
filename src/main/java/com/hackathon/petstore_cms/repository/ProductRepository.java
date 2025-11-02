@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // THIS IS THE NEW, CORRECT METHOD
+
     List<Product> findByType(String type);
     
     // This is for Module 6: Smart Inventory Alert

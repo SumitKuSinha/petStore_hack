@@ -31,17 +31,17 @@ public class StorefrontController {
         return "index";
     }
 
-    // 2. Checkout Flow - CRITICAL FIX HERE (Removed Hyphen)
+  
     @PostMapping("/pay")
     public String processPayment() {
-        // ★ Redirect to the new, consistent URL
+        //  Redirect to the new, consistent URL
         return "redirect:/thankyou"; 
     }
     
-    // 3. Thank You Page - CRITICAL FIX HERE (Removed Hyphen)
+   
     @GetMapping("/thankyou")
     public String showThankYouPage() {
-        // ★ Returns the template named "thankyou.html"
+        //  Returns the template named "thankyou.html"
         return "thankyou"; 
     }
 

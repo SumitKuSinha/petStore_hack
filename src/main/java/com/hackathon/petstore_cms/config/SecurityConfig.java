@@ -1,6 +1,6 @@
 package com.hackathon.petstore_cms.config;
 
-// Make sure all these imports are correct
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -12,9 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import com.hackathon.petstore_cms.service.UserService;
 
-// The following imports are no longer needed for the final fix:
-// import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-// import org.springframework.http.HttpStatus;
+
 
 
 @Configuration
@@ -46,7 +44,7 @@ public class SecurityConfig {
                     "/js/**",
                     "/style.css",
                     "/images/**",
-                    "/logout-success" // ★ IMPORTANT: The success page must be public
+                    "/logout-success" // The success page must be public
                 ).permitAll()
 
                 // 2. These pages are ADMIN-ONLY
@@ -61,7 +59,7 @@ public class SecurityConfig {
                 .successHandler(myAuthenticationSuccessHandler())
                 .permitAll()
             )
-            // --- CRITICAL LOGOUT FIX: Redirects to a client-side reload page ---
+            // Redirects to a client-side reload page ---
             .logout(logout -> logout
                 .logoutUrl("/logout") 
                 // ★ CHANGE: Redirects to our auto-reloading page
@@ -70,7 +68,7 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
             );
-            // --------------------------------------------------------------------
+           
 
         return http.build();
     }

@@ -1,4 +1,4 @@
-/* === Modern Pet Store Stylesheet === */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
 * {
@@ -200,7 +200,6 @@ h1 {
     border: none;
     padding: 0;
     cursor: pointer;
-    /* Make sure it matches the navbar font */
     font-family: 'Poppins', sans-serif; 
 }
 
