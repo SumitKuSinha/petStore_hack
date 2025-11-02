@@ -12,29 +12,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* --- Custom Color Variables (Matching Theme) --- */
+        /* --- Custom Color Variables --- */
         :root {
-            --pawfect-primary: #17a2b8; /* Teal/Cyan */
-            --pawfect-secondary: #008080; /* Darker Teal */
+            --pawfect-primary: #00A388; /* Friendly Teal */
             --pawfect-accent: #ffc107; /* Yellow Accent */
-            --navbar-bg: #e0f2f1;
+            --navbar-bg: #343a40; /* Dark Gray (Bootstrap bg-dark) */
             --body-bg: #f8f9fa; 
         }
 
         /* --- Global & Theme Styling --- */
-        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--body-bg); }
         .container { margin-top: 30px; }
 
         .brand-title {
             font-size: 3.5rem; 
             font-weight: 800; 
-            color: #17a2b8; 
+            color: var(--pawfect-primary); 
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .section-heading {
-            border-bottom: 3px solid #ffc107; 
+            border-bottom: 3px solid var(--pawfect-accent); 
             padding-bottom: 10px;
             margin-bottom: 30px !important;
             font-weight: 700;
@@ -55,8 +54,15 @@
         }
         .card-price {
             font-size: 1.4rem;
-            color: #B12704;
+            color: #B12704; /* Dark Red Price */
             font-weight: bold;
+        }
+        /* Fix for navbar dropdown text being too close */
+        .dropdown-menu {
+            border: 1px solid rgba(0, 0, 0, 0.15);
+        }
+        .dropdown-menu a.dropdown-item {
+            color: #212529 !important; /* Force dark text in light dropdown */
         }
     </style>
 </head>
@@ -64,7 +70,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/}" style="color: var(--pawfect-secondary) !important;">PawFect Stop</a>
+        <a class="navbar-brand text-light" th:href="@{/}" style="color: white !important;">PawFect Stop</a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -74,7 +80,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-dark" href="#" id="petsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="petsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Pets
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="petsDropdown">
@@ -84,7 +90,7 @@
                 </li>
                 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-dark" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Products
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="productsDropdown">
@@ -100,18 +106,21 @@
             
             <form th:action="@{/search}" method="GET" class="d-flex me-3">
                 <input class="form-control me-2" type="search" name="keyword" placeholder="Search..." aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <button class="btn btn-outline-light" type="submit">Search</button>
             </form>
 
             <div class="d-flex align-items-center">
+                
                 <div sec:authorize="hasRole('ADMIN')" class="me-3">
-                    <a th:href="@{/admin/pets}" class="btn btn-sm btn-primary me-2">Pet Admin</a>
-                    <a th:href="@{/admin/products}" class="btn btn-sm btn-primary">Product Admin</a>
+                    <a th:href="@{/admin/pets}" class="btn btn-sm btn-warning me-2">Pet Admin</a>
+                    <a th:href="@{/admin/products}" class="btn btn-sm btn-warning">Product Admin</a>
                 </div>
+                
                 <div sec:authorize="isAnonymous()">
-                    <a th:href="@{/login}" class="btn btn-sm btn-outline-secondary me-2">Login</a>
+                    <a th:href="@{/login}" class="btn btn-sm btn-outline-light me-2">Login</a>
                     <a th:href="@{/register}" class="btn btn-sm btn-primary">Register</a>
                 </div>
+                
                 <div sec:authorize="isAuthenticated()">
                     <form th:action="@{/logout}" method="POST" style="display: inline;">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -125,7 +134,7 @@
 
 <div class="container mt-4">
     <h1 class="mb-5 text-center brand-title">
-        PawFect
+        PawFect Stop
     </h1>
 
     <h2 class="mb-4 section-heading">🐾 Pets Available for Adoption</h2>
@@ -171,7 +180,9 @@
                 <div class="card-footer bg-white border-0 pt-0">
                     <a href="#" class="btn btn-warning w-100 btn-buy" 
                        th:data-name="${prod.name}" 
-                       th:data-price="${prod.price}">Buy Now</a>
+                       th:data-price="${prod.price}"
+                       data-bs-toggle="modal"
+                       data-bs-target="#checkout-modal">Buy Now</a>
                 </div>
             </div>
         </div>
@@ -188,9 +199,7 @@
             
             <form th:action="@{/pay}" method="POST"> 
                 
-                <input type="hidden" 
-                       th:name="${_csrf.parameterName}" 
-                       th:value="${_csrf.token}" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="modal-body">
                     
                     <h3>You are buying: <span id="modal-item-name">Item Name</span></h3>
